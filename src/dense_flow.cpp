@@ -17,7 +17,11 @@ void calcDenseFlow(std::string file_name, int bound, int type, int step,
     Mat capture_frame, capture_image, prev_image, capture_gray, prev_gray;
     Mat flow, flow_split[2];
 
+#if CV_MAJOR_VERSION >= 4
+    cv::Ptr<cv::DISOpticalFlow> alg_tvl1 = cv::DISOpticalFlow::create();
+#else
     cv::Ptr<cv::DualTVL1OpticalFlow> alg_tvl1 = cv::createOptFlow_DualTVL1();
+#endif
 
     bool initialized = false;
     for(int iter = 0;; iter++){
@@ -29,12 +33,12 @@ void calcDenseFlow(std::string file_name, int bound, int type, int step,
             initializeMats(capture_frame, capture_image, capture_gray,
                            prev_image, prev_gray);
             capture_frame.copyTo(prev_image);
-            cvtColor(prev_image, prev_gray, CV_BGR2GRAY);
+            cvtColor(prev_image, prev_gray, cv::COLOR_BGR2GRAY);
             initialized = true;
 //            LOG(INFO)<<"Initialized";
         }else if(iter % step == 0){
             capture_frame.copyTo(capture_image);
-            cvtColor(capture_image, capture_gray, CV_BGR2GRAY);
+            cvtColor(capture_image, capture_gray, cv::COLOR_BGR2GRAY);
 
             switch(type){
                 case 0: {
